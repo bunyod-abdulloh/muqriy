@@ -98,3 +98,20 @@ class Database:
     async def select_all_muqriyaudio(self):
         sql = "SELECT sequence, sura_name, audiomuqriy FROM quranedu_quranedu ORDER BY sequence"
         return await self.execute(sql, fetch=True)
+
+    async def select_muqriyaudio(self, sequence):
+        sql = f"SELECT sequence, sura_name, audiomuqriy FROM quranedu_quranedu WHERE sequence='{sequence}'ORDER BY sequence"
+        return await self.execute(sql, fetchrow=True)
+
+    async def select_all_husary(self):
+        sql = "SELECT sequence, sura_name, audiohusary, zip FROM quranedu_quranedu ORDER BY sequence"
+        return await self.execute(sql, fetch=True)
+
+    async def select_husary(self, sequence):
+        sql = (f"SELECT sequence, sura_name, total_verses, audiohusary, zip FROM quranedu_quranedu "
+               f"WHERE sequence='{sequence}'ORDER BY sequence")
+        return await self.execute(sql, fetchrow=True)
+
+    async def select_husary_verses(self, sequence):
+        sql = f"SELECT sura_name, total_verses FROM quranedu_quranedu WHERE sequence='{sequence}'ORDER BY sequence"
+        return await self.execute(sql, fetchrow=True)

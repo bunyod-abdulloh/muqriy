@@ -1,1 +1,1 @@
-from . import buttons
+from . import quran_ibuttons

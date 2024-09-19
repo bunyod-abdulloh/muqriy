@@ -6,7 +6,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from bot.filters.admin import IsBotAdminFilter
-from bot.keyboards.inline.buttons import are_you_sure_markup
+from bot.keyboards.inline.quran_ibuttons import are_you_sure_markup
 from bot.states.test import AdminState
 from data.config import ADMIN_ID
 from loader import db, bot

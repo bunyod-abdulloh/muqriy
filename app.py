@@ -59,7 +59,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
 
 async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
     logger.info("Stopping polling")
-    await bot.send_message(chat_id=ADMIN_ID, text='Bot stoppped!')
+    # await bot.send_message(chat_id=ADMIN_ID, text='Bot stoppped!')
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.session.close()
     await dispatcher.storage.close()
