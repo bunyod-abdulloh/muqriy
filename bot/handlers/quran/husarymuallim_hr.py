@@ -86,39 +86,113 @@ async def husary_select_rtr(call: types.CallbackQuery, state: FSMContext):
 @router.message(Husary.get_ayah)
 async def husary_ayah_rtr(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    sura_number = data['sura_number'].lstrip('0')
-    ayah_number = int(message.text)
-
+    sura_photo = data['sura_number'].lstrip('0')
+    sura_audio = data['sura_number']
+    ayah_photo = int(message.text)
 
     sura = await db.select_husary_verses(
-        sequence=data['sura_number']
+        sequence=sura_audio
     )
-    if message.text.isdigit() and ayah_number <= sura['total_verses']:
-        photo = f"https://www.everyayah.com/data/images_png/{sura_number}_{ayah_number}.png"
-        audio = f"https://www.everyayah.com/data/Husary_Muallim_128kbps/{data['sura_number']}{ayah_number}.mp3"
+    total_verses = sura['total_verses']
+
+    if message.text.isdigit() and ayah_photo <= total_verses:
+
+        ayah_audio = message.text.zfill(3)
+
+        photo = f"https://www.everyayah.com/data/images_png/{sura_photo}_{ayah_photo}.png"
+        audio = f"https://www.everyayah.com/data/Husary_Muallim_128kbps/{sura_audio}{ayah_audio}.mp3"
+
         await message.answer_photo(
             photo=photo
         )
-        if ayah_number == 1:
+
+        if ayah_photo == 1:
             await message.answer_audio(
                 audio=audio, reply_markup=quran_next_ibutton(
-                    sura_number=sura_number, ayah_number=ayah_number
+                    sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=message.text,
+                    ayah_photo=ayah_photo, total_verses=total_verses
                 )
             )
-        elif ayah_number == sura['total_verses']:
+        elif ayah_photo == total_verses:
             await message.answer_audio(
                 audio=audio, reply_markup=quran_prev_ibutton(
-                    sura_number=sura_number, ayah_number=ayah_number
+                    sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=message.text,
+                    ayah_photo=ayah_photo, total_verses=total_verses
                 )
             )
         else:
             await message.answer_audio(
                 audio=audio, reply_markup=quran_next_prev_ibuttons(
-                    sura_number=sura_number, ayah_number=ayah_number
+                    sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=message.text,
+                    ayah_photo=ayah_photo, total_verses=total_verses
                 )
             )
     else:
         await message.answer(
             text=f"Oyat tartib raqami noto'g'ri kiritildi!\n\n"
-                 f"{sura['sura_name']} surasidagi jami oyatlar soni {sura['total_verses']} ta"
+                 f"{sura['sura_name']} surasidagi jami oyatlar soni {total_verses} ta"
+        )
+
+
+@router.callback_query(F.data.startswith('husarynext_'))
+async def husary_ayah_fnext_rtr(call: types.CallbackQuery):
+    sura_audio = call.data.split('_')[1]
+    sura_photo = call.data.split('_')[2]
+    ayah_audio = int(call.data.split('_')[3]) + 1
+    ayah_audio_ = str(ayah_audio).zfill(3)
+    ayah_photo = int(call.data.split('_')[4]) + 1
+    total_verses = call.data.split('_')[5]
+
+    photo = f"https://www.everyayah.com/data/images_png/{sura_photo}_{ayah_photo}.png"
+    audio = f"https://www.everyayah.com/data/Husary_Muallim_128kbps/{sura_audio}{ayah_audio_}.mp3"
+
+    await call.message.answer_photo(
+        photo=photo
+    )
+
+    if ayah_photo == total_verses:
+        await call.message.answer_audio(
+            audio=audio, reply_markup=quran_prev_ibutton(
+                sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=ayah_audio,
+                ayah_photo=ayah_photo, total_verses=total_verses
+            )
+        )
+    else:
+        await call.message.answer_audio(
+            audio=audio, reply_markup=quran_next_prev_ibuttons(
+                sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=ayah_audio,
+                ayah_photo=ayah_photo, total_verses=total_verses
+            )
+        )
+
+
+@router.callback_query(F.data.startswith('husaryprev_'))
+async def husary_ayah_fprev_rtr(call: types.CallbackQuery):
+    sura_audio = call.data.split('_')[1]
+    sura_photo = call.data.split('_')[2]
+    ayah_audio = int(call.data.split('_')[3]) - 1
+    ayah_audio_ = str(ayah_audio).zfill(3)
+    ayah_photo = int(call.data.split('_')[4]) - 1
+    total_verses = call.data.split('_')[5]
+
+    photo = f"https://www.everyayah.com/data/images_png/{sura_photo}_{ayah_photo}.png"
+    audio = f"https://www.everyayah.com/data/Husary_Muallim_128kbps/{sura_audio}{ayah_audio_}.mp3"
+
+    await call.message.answer_photo(
+        photo=photo
+    )
+
+    if str(ayah_photo) == '1':
+        await call.message.answer_audio(
+            audio=audio, reply_markup=quran_next_ibutton(
+                sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=ayah_audio,
+                ayah_photo=ayah_photo, total_verses=total_verses
+            )
+        )
+    else:
+        await call.message.answer_audio(
+            audio=audio, reply_markup=quran_next_prev_ibuttons(
+                sura_audio=sura_audio, sura_photo=sura_photo, ayah_audio=ayah_audio,
+                ayah_photo=ayah_photo, total_verses=total_verses
+            )
         )

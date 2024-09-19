@@ -49,36 +49,40 @@ def key_returner_muqriy_husary(items, callback_data, current_page, all_pages, se
     return builder.as_markup()
 
 
-def quran_next_prev_ibuttons(sura_number, ayah_number):
+def quran_next_prev_ibuttons(sura_audio, sura_photo, ayah_audio, ayah_photo, total_verses):
     markup = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(
-                text="Keyingi ➡️", callback_data=f"qurannxt_{sura_number}_{ayah_number}"
+                text="⬅️ Oldingi",
+                callback_data=f"husaryprev_{sura_audio}_{sura_photo}_{ayah_audio}_{ayah_photo}_{total_verses}"
             ),
             InlineKeyboardButton(
-                text="⬅️ Oldingi", callback_data=f"quranprev_{sura_number}_{ayah_number}"
+                text="Keyingi ➡️",
+                callback_data=f"husarynext_{sura_audio}_{sura_photo}_{ayah_audio}_{ayah_photo}_{total_verses}"
             )
         ]]
     )
     return markup
 
 
-def quran_prev_ibutton(sura_number, ayah_number):
+def quran_prev_ibutton(sura_audio, sura_photo, ayah_audio, ayah_photo, total_verses):
     markup = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(
-                text="⬅️ Oldingi", callback_data=f"quranprev:{sura_number}:{ayah_number}"
+                text="⬅️ Oldingi",
+                callback_data=f"husaryprev_{sura_audio}_{sura_photo}_{ayah_audio}_{ayah_photo}_{total_verses}"
             )
         ]]
     )
     return markup
 
 
-def quran_next_ibutton(sura_number, ayah_number):
+def quran_next_ibutton(sura_audio, sura_photo, ayah_audio, ayah_photo, total_verses):
     markup = InlineKeyboardMarkup(
         inline_keyboard=[[
             InlineKeyboardButton(
-                text="Keyingi ➡️", callback_data=f"qurannext:{sura_number}:{ayah_number}"
+                text="Keyingi ➡️",
+                callback_data=f"husarynext_{sura_audio}_{sura_photo}_{ayah_audio}_{ayah_photo}_{total_verses}"
             )
         ]]
     )
