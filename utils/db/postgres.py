@@ -95,6 +95,10 @@ class Database:
         sql = "UPDATE quranedu_quranedu SET audiomuqriy=$1 WHERE sequence=$2"
         return await self.execute(sql,audiomuqriy, sequence, execute=True)
 
+    async def update_temp_to_muqriy(self, audiomuqriy):
+            sql = "UPDATE quranedu_quranedu SET audiomuqriy=$1"
+            return await self.execute(sql,audiomuqriy, execute=True)
+
     async def select_all_muqriyaudio(self):
         sql = "SELECT sequence, sura_name, audiomuqriy FROM quranedu_quranedu ORDER BY sequence"
         return await self.execute(sql, fetch=True)

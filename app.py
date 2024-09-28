@@ -1,4 +1,7 @@
+import asyncio
+
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.middlewares.request_logging import logger
 from data.config import BASE_URL, WEBHOOK_PATH, ADMIN_ID, HOST, PORT
 
@@ -51,7 +54,9 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
 
     logger.info("Database connected")
     await database_connected()
-    await bot.set_webhook(f"{BASE_URL}{WEBHOOK_PATH}")
+
+    logger.info("Starting polling")
+    await bot.delete_webhook(drop_pending_updates=True)
     await setup_aiogram(dispatcher=dispatcher)
     await on_startup_notify(bot=bot)
     await set_default_commands(bot=bot)
@@ -59,36 +64,31 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:
 
 async def on_shutdown(dispatcher: Dispatcher, bot: Bot):
     logger.info("Stopping polling")
-    # await bot.send_message(chat_id=ADMIN_ID, text='Bot stoppped!')
-    await bot.delete_webhook(drop_pending_updates=True)
     await bot.session.close()
     await dispatcher.storage.close()
 
 
 def main():
     """CONFIG"""
-    from aiogram.client.default import DefaultBotProperties
-    from aiogram.enums import ParseMode
     from data.config import BOT_TOKEN
+    from aiogram.enums import ParseMode
     from aiogram.fsm.storage.memory import MemoryStorage
-    from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-    from aiohttp import web
-
     default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
-
     bot = Bot(token=BOT_TOKEN, default=default_properties)
     storage = MemoryStorage()
     dispatcher = Dispatcher(storage=storage)
 
     dispatcher.startup.register(on_startup)
     dispatcher.shutdown.register(on_shutdown)
+    asyncio.run(dispatcher.start_polling(bot, close_bot_session=True,
+                                         allowed_updates=dispatcher.resolve_used_update_types()))
 
-    app = web.Application()
-    webhook_requests_handler = SimpleRequestHandler(
-        dispatcher=dispatcher,
-        bot=bot
-    )
 
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        logger.info("Bot stopped!")
     webhook_requests_handler.register(app, path=WEBHOOK_PATH)
 
     setup_application(app, dispatcher, bot=bot)

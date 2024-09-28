@@ -1,6 +1,9 @@
 from typing import List
 
 from aiogram import F, Router, types
+from aiogram.filters import StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import default_state
 from aiogram.types import (
     InputMediaAudio,
     InputMediaDocument,
@@ -30,21 +33,27 @@ async def handle_albums(message: Message, album: List[Message]):
         # elif element.document:
         #     input_media = InputMediaDocument(media=element.document.file_id, **caption_kwargs)
         if element.audio:
-            pass
-            # sura_number = element.audio.file_name.split(".")[0]
-            # await message.answer(
-            #     text=f"<code>{element.audio.file_id}</code>\n\n{element.audio.file_name}"
-            # )
-            # await db.update_edu_to_muqriy(
-            #     sequence=sura_number,
-            #     audiomuqriy=element.audio.file_id
-            # )
+            for n in range(11):
+                sura_number = element.audio.file_name.split(".")[0]
+                # await message.answer(
+                #     text=f"<code>{element.audio.file_id}</code>\n\n{element.audio.file_name}"
+                # )
+                print(n)
+                await db.update_temp_to_muqriy(
+                    audiomuqriy=element.audio.file_id
+                )
+                # await db.update_edu_to_muqriy(
+                #     sequence=sura_number,
+                #     audiomuqriy=element.audio.file_id
+                # )
         else:
             return message.answer("This media type isn't supported!")
 
 
 @router.message(F.text == "Qur'oni Karim tilovati (Hasanxon va Husaynxon qorilar)")
-async def quran_hasanxon_husaynxon_handler(message: types.Message):
+async def quran_hasanxon_husaynxon_handler(message: types.Message, state: FSMContext):
+    await state.clear()
+
     muqriy_recitation = await db.select_all_muqriyaudio()
 
     extract = extracter(
@@ -158,6 +167,9 @@ async def quran_hasanxon_husaynxon_alert(call: types.CallbackQuery):
 
 @router.callback_query(F.data.startswith("content_audiomuqriy:"))
 async def quran_hasanxon_husaynxon_content(call: types.CallbackQuery):
+    await call.answer(
+        cache_time=0
+    )
     current_page = int(call.data.split(":")[1])
     muqriy_recitation = await db.select_all_muqriyaudio()
     extract = extracter(
