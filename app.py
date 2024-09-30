@@ -46,6 +46,7 @@ async def database_connected():
     await db.create()
     # await db.drop_users()
     await db.create_table_users()
+    await db.create_table_qurantanishuv()
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot) -> None:

@@ -119,3 +119,28 @@ class Database:
     async def select_husary_verses(self, sequence):
         sql = f"SELECT sura_name, total_verses FROM quranedu_quranedu WHERE sequence='{sequence}'ORDER BY sequence"
         return await self.execute(sql, fetchrow=True)
+
+    # =========================== QURANTANISHUV =========================
+    async def create_table_qurantanishuv(self):
+        sql = """
+        CREATE TABLE IF NOT EXISTS qurantanishuv (
+        id SERIAL PRIMARY KEY,        
+        audio_id VARCHAR(200) NULL,
+        video_id VARCHAR(200) NULL,
+        caption VARCHAR(3000) NULL,
+        link VARCHAR(300) NULL
+        );
+        """
+        await self.execute(sql, execute=True)
+
+    async def add_audio_quranishuv(self, audio_id, caption, link):
+        sql = "INSERT INTO qurantanishuv (audio_id, caption, link) VALUES($1, $2, $3)"
+        return await self.execute(sql, audio_id, caption, link, fetchrow=True)
+
+    async def update_videos_qurantanishuv(self, video_id):
+        sql = "UPDATE qurantanishuv SET video_id=$1"
+        return await self.execute(sql, video_id, execute=True)
+
+    async def select_file_qurantanishuv(self, id_):
+        sql = f"SELECT * FROM qurantanishuv WHERE id='{id_}'"
+        return await self.execute(sql, fetchrow=True)

@@ -19,3 +19,10 @@ async def do_start(message: types.Message):
         text=f"Assalomu alaykum!",
         reply_markup=main_menu_buttons()
     )
+
+
+@router.callback_query(F.data == "back_main")
+async def back_to_main(call: types.CallbackQuery):
+    await call.message.answer(
+        text="Bosh sahifa",  reply_markup=main_menu_buttons()
+    )

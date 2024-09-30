@@ -167,9 +167,6 @@ async def quran_hasanxon_husaynxon_alert(call: types.CallbackQuery):
 
 @router.callback_query(F.data.startswith("content_audiomuqriy:"))
 async def quran_hasanxon_husaynxon_content(call: types.CallbackQuery):
-    await call.answer(
-        cache_time=0
-    )
     current_page = int(call.data.split(":")[1])
     muqriy_recitation = await db.select_all_muqriyaudio()
     extract = extracter(
